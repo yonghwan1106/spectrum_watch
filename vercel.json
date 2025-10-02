@@ -3,8 +3,5 @@
   "outputDirectory": ".next",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "env": {
-    "ANTHROPIC_API_KEY": "@anthropic-api-key"
-  }
+  "framework": "nextjs"
 }
