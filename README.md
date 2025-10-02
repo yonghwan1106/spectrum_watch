@@ -8,6 +8,19 @@ AI 기반 실시간 주파수 이상 신호 탐지 및 시각화 플랫폼
 
 스펙트럼 워치는 한국방송통신전파진흥원(KCA) 국민참여형 사업예산 제안 공모를 위해 개발된 프로토타입 플랫폼입니다. Anthropic Claude Sonnet API를 활용하여 주파수 데이터를 실시간으로 분석하고, 이상 신호를 자동으로 탐지합니다.
 
+## 🚀 Vercel 배포 참고사항
+
+이 프로젝트는 **in-memory SQLite 데이터베이스**를 사용합니다. Vercel과 같은 서버리스 환경에서는 파일 시스템 접근이 제한되므로, 각 요청마다 새로운 인스턴스가 생성되어 데이터가 초기화됩니다.
+
+**프로덕션 환경**에서는 다음 중 하나를 사용하는 것을 권장합니다:
+- Vercel Postgres
+- Supabase
+- PlanetScale
+- MongoDB Atlas
+
+환경 변수 설정 (Vercel Dashboard):
+- `ANTHROPIC_API_KEY`: Claude API 키
+
 ### 주요 기능
 
 - 🤖 **AI 기반 이상 신호 탐지**: Claude Sonnet API를 활용한 실시간 분석

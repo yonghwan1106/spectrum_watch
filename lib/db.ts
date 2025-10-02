@@ -1,16 +1,8 @@
 import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
 
-const dbPath = path.join(process.cwd(), 'data', 'spectrum.db');
-const dbDir = path.dirname(dbPath);
-
-// Ensure data directory exists
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-}
-
-const db = new Database(dbPath);
+// Use in-memory database for serverless environments (Vercel)
+// In production, you would want to use a cloud database like Vercel Postgres
+const db = new Database(':memory:');
 
 // Initialize database schema
 export function initDB() {
@@ -89,5 +81,77 @@ export function seedLocations() {
 
   console.log('Seed locations inserted successfully');
 }
+
+// Auto-generate mock data for in-memory database
+function generateMockData() {
+  const locations = [
+    'seoul-01', 'busan-01', 'incheon-01', 'daegu-01',
+    'daejeon-01', 'gwangju-01', 'ulsan-01'
+  ];
+
+  const signalTypes = [
+    { name: 'LTE', freqRange: [1700, 1900], power: [-80, -40] },
+    { name: 'WiFi', freqRange: [2400, 2500], power: [-70, -30] },
+    { name: 'FM Radio', freqRange: [88, 108], power: [-60, -20] },
+    { name: '5G', freqRange: [3400, 3600], power: [-75, -35] },
+  ];
+
+  const insertSpectrum = db.prepare(`
+    INSERT INTO spectrum_data (timestamp, frequency, power, location_id, bandwidth, modulation_type)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  const insertAnalysis = db.prepare(`
+    INSERT INTO analysis_results (spectrum_data_id, is_anomaly, anomaly_type, confidence_score, reasoning)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  // Generate 100 mock spectrum data points
+  for (let i = 0; i < 100; i++) {
+    const location = locations[Math.floor(Math.random() * locations.length)];
+    const signalType = signalTypes[Math.floor(Math.random() * signalTypes.length)];
+    const frequency = signalType.freqRange[0] + Math.random() * (signalType.freqRange[1] - signalType.freqRange[0]);
+    const power = signalType.power[0] + Math.random() * (signalType.power[1] - signalType.power[0]);
+    const timestamp = new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString();
+
+    const result = insertSpectrum.run(
+      timestamp,
+      frequency,
+      power,
+      location,
+      5 + Math.random() * 15,
+      signalType.name
+    );
+
+    // 15% chance of anomaly
+    if (Math.random() < 0.15) {
+      const anomalyTypes = ['Jamming', 'Spike', 'Unknown Signal', 'Illegal Broadcasting'];
+      const anomalyType = anomalyTypes[Math.floor(Math.random() * anomalyTypes.length)];
+
+      insertAnalysis.run(
+        result.lastInsertRowid,
+        1,
+        anomalyType,
+        0.7 + Math.random() * 0.3,
+        `Detected ${anomalyType} signal with unusual characteristics`
+      );
+    } else {
+      insertAnalysis.run(
+        result.lastInsertRowid,
+        0,
+        null,
+        0.9 + Math.random() * 0.1,
+        'Normal signal pattern detected'
+      );
+    }
+  }
+
+  console.log('Mock data generated successfully');
+}
+
+// Initialize database and generate mock data on startup
+initDB();
+seedLocations();
+generateMockData();
 
 export { db };
