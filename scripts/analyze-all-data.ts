@@ -22,7 +22,6 @@ async function analyzeAllData() {
 
   if (unanalyzedData.length === 0) {
     console.log('No data to analyze. Exiting.');
-    db.close();
     return;
   }
 
