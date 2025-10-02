@@ -5,10 +5,10 @@ import type { ApiResponse } from '@/lib/types';
 // GET: 특정 이상 신호의 히스토리 데이터 (같은 위치, 같은 주파수 대역)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // 먼저 해당 이상 신호의 정보를 가져옴
     const anomaly = db

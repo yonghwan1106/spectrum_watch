@@ -5,10 +5,10 @@ import type { ApiResponse } from '@/lib/types';
 // GET: 특정 이상 신호 상세 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const anomaly = db
       .prepare(
