@@ -114,6 +114,12 @@ export default function Home() {
             </div>
             <div className="flex gap-2 md:gap-3">
               <Link
+                href="/about"
+                className="px-3 md:px-4 py-2 text-sm md:text-base bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition transform hover:scale-105"
+              >
+                소개
+              </Link>
+              <Link
                 href="/learn"
                 className="px-3 md:px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 transition transform hover:scale-105"
               >
