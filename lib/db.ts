@@ -151,16 +151,16 @@ export const db = {
           return Object.values(hours).sort((a: any, b: any) => a.hour.localeCompare(b.hour));
         }
 
-        if (sql.includes('frequency_band')) {
+        if (sql.includes('as band') && sql.includes('GROUP BY band')) {
           // Frequency band data
           const bands: any = {};
           spectrumData.forEach(s => {
             let band = 'Other';
-            if (s.frequency < 100) band = 'FM Radio (88-108 MHz)';
-            else if (s.frequency >= 500 && s.frequency < 700) band = 'TV (500-600 MHz)';
-            else if (s.frequency >= 1700 && s.frequency < 1900) band = 'LTE (1800 MHz)';
-            else if (s.frequency >= 2300 && s.frequency < 2500) band = 'Wi-Fi (2.4 GHz)';
-            else if (s.frequency >= 3400 && s.frequency < 3600) band = '5G (3.5 GHz)';
+            if (s.frequency >= 88 && s.frequency < 108) band = 'FM Radio (88-108 MHz)';
+            else if (s.frequency >= 470 && s.frequency < 700) band = 'TV (470-700 MHz)';
+            else if (s.frequency >= 1700 && s.frequency < 2000) band = 'LTE (1.8 GHz)';
+            else if (s.frequency >= 2300 && s.frequency < 2600) band = 'Wi-Fi/LTE (2.4 GHz)';
+            else if (s.frequency >= 3300 && s.frequency < 3800) band = '5G (3.5 GHz)';
 
             if (!bands[band]) bands[band] = { band, anomaly_count: 0, total_count: 0, avg_power: 0 };
             bands[band].total_count++;
