@@ -116,6 +116,22 @@ export const db = {
           return locations;
         }
 
+        if (sql.includes('as type') && sql.includes('GROUP BY a.anomaly_type')) {
+          // Anomaly types data
+          const types: any = {};
+          analysisResults.filter(a => a.is_anomaly === 1).forEach(a => {
+            const type = a.anomaly_type || 'Unknown';
+            if (!types[type]) types[type] = { type, count: 0, avg_confidence: 0, sum: 0 };
+            types[type].count++;
+            types[type].sum += a.confidence_score;
+          });
+          return Object.values(types).map((t: any) => ({
+            type: t.type,
+            count: t.count,
+            avg_confidence: t.sum / t.count,
+          }));
+        }
+
         if (sql.includes('FROM analysis_results') && sql.includes('is_anomaly = 1')) {
           const limit = sql.match(/LIMIT (\d+)/)?.[1] || '20';
           return analysisResults
@@ -190,21 +206,6 @@ export const db = {
           return Object.values(regions);
         }
 
-        if (sql.includes('anomaly_types')) {
-          // Anomaly types data
-          const types: any = {};
-          analysisResults.filter(a => a.is_anomaly === 1).forEach(a => {
-            const type = a.anomaly_type || 'Unknown';
-            if (!types[type]) types[type] = { type, count: 0, avg_confidence: 0, sum: 0 };
-            types[type].count++;
-            types[type].sum += a.confidence_score;
-          });
-          return Object.values(types).map((t: any) => ({
-            type: t.type,
-            count: t.count,
-            avg_confidence: t.sum / t.count,
-          }));
-        }
 
         return [];
       },
