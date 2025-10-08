@@ -36,20 +36,20 @@ export async function GET(request: NextRequest) {
         .prepare(
           `SELECT
             CASE
-              WHEN s.frequency < 100 THEN 'FM Radio (88-108 MHz)'
-              WHEN s.frequency >= 500 AND s.frequency < 700 THEN 'TV (500-600 MHz)'
-              WHEN s.frequency >= 1700 AND s.frequency < 1900 THEN 'LTE (1800 MHz)'
-              WHEN s.frequency >= 2300 AND s.frequency < 2500 THEN 'Wi-Fi (2.4 GHz)'
-              WHEN s.frequency >= 3400 AND s.frequency < 3600 THEN '5G (3.5 GHz)'
+              WHEN s.frequency >= 88 AND s.frequency < 108 THEN 'FM Radio (88-108 MHz)'
+              WHEN s.frequency >= 470 AND s.frequency < 700 THEN 'TV (470-700 MHz)'
+              WHEN s.frequency >= 1700 AND s.frequency < 2000 THEN 'LTE (1.8 GHz)'
+              WHEN s.frequency >= 2300 AND s.frequency < 2600 THEN 'Wi-Fi/LTE (2.4 GHz)'
+              WHEN s.frequency >= 3300 AND s.frequency < 3800 THEN '5G (3.5 GHz)'
               ELSE 'Other'
             END as band,
             COUNT(CASE WHEN a.is_anomaly = 1 THEN 1 END) as anomaly_count,
             COUNT(*) as total_count,
-            AVG(s.power) as avg_power
+            ROUND(AVG(s.power), 2) as avg_power
           FROM spectrum_data s
           LEFT JOIN analysis_results a ON s.id = a.spectrum_data_id
-          WHERE s.timestamp >= datetime('now', '-24 hours')
           GROUP BY band
+          HAVING total_count > 0
           ORDER BY total_count DESC`
         )
         .all();
